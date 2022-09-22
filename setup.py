@@ -16,5 +16,5 @@ setup(
     license="MIT",
     packages=find_packages(where="urnng"),
     install_requires=requirements,
-    python_requires="3.6",
+    python_requires=">=3.6,<3.7",
 )
