@@ -79,6 +79,14 @@ def main(args):
     if args.param_init > 0:
       for param in model.parameters():    
         param.data.uniform_(-args.param_init, args.param_init)      
+    checkpoint = {
+      'args': args.__dict__,
+      'model': model.cpu(),
+      'word2idx': train_data.word2idx,
+      'idx2word': train_data.idx2word
+    }
+    print('Saving checkpoint to %s' % args.save_path)
+    torch.save(checkpoint, args.save_path)
   else:
     print('loading model from ' + args.train_from)
     checkpoint = torch.load(args.train_from)
