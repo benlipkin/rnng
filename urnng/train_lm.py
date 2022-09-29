@@ -44,7 +44,7 @@ parser.add_argument('--lr', default=1, type=float, help='starting learning rate'
 parser.add_argument('--decay', default=0.5, type=float, help='')
 parser.add_argument('--param_init', default=0.1, type=float, help='parameter initialization (over uniform)')
 parser.add_argument('--max_grad_norm', default=5, type=float, help='gradient clipping parameter')
-parser.add_argument('--gpu', default=2, type=int, help='which gpu to use')
+parser.add_argument('--gpu', default=0, type=int, help='which gpu to use')
 parser.add_argument('--seed', default=3435, type=int, help='random seed')
 parser.add_argument('--print_every', type=int, default=500, help='print stats after this many batches')
 

@@ -30,7 +30,7 @@ parser.add_argument('--model_file', default='')
 parser.add_argument('--is_temp', default=2., type=float, help='divide scores by is_temp before CRF')
 parser.add_argument('--samples', default=1000, type=int, help='samples for IS calculation')
 parser.add_argument('--count_eos_ppl', default=0, type=int, help='whether to count eos in val PPL')
-parser.add_argument('--gpu', default=2, type=int, help='which gpu to use')
+parser.add_argument('--gpu', default=0, type=int, help='which gpu to use')
 parser.add_argument('--seed', default=3435, type=int)
 
 
