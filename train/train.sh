@@ -43,7 +43,6 @@ elif [[ "$MODEL" =~ _n.pt ]]; then
         --train_file data/ptb-train.json \
         --val_file data/ptb-val.json \
         --save_path "$MODEL_DIR/$MODEL" \
-        --batch_size 512 \
         --fixed_stack \
         --strategy top_down \
         --optimizer adam
@@ -52,7 +51,6 @@ elif [[ "$MODEL" =~ _n.pt ]]; then
         --train_file data/ptb-train.json \
         --val_file data/ptb-val.json \
         --save_path "$MODEL_DIR/$MODEL" \
-        --batch_size 512 \
         --fixed_stack \
         --strategy in_order \
         --optimizer adam

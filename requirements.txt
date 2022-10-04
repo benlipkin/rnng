@@ -1,2 +1,4 @@
 nltk==3.6.7
+tensorboard==2.10.1
 torch==1.7.0
+
