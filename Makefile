@@ -1,6 +1,6 @@
 SHELL := /usr/bin/env bash
 EXEC = python=3.6
-PACKAGE = urnng
+PACKAGE = rnng
 INSTALL = pip install -e .
 ACTIVATE = source activate $(PACKAGE)
 .DEFAULT_GOAL := help
@@ -24,9 +24,10 @@ $(PACKAGE).egg-info/ : setup.py requirements.txt
 
 ## setup     : download large files and prepare runtime.
 .PHONY : setup
-setup : env $(PACKAGE)/models/rnng_ptb.pt
-$(PACKAGE)/models/rnng_ptb.pt : setup/setup.sh
-	@$(ACTIVATE) ; cd $(<D) ; bash $(<F)
+	@$(ACTIVATE) ;
+# setup : env models/rnnlm_ptb_k.pt
+# models/rnnlm_ptb_k.pt : setup/setup.sh
+# 	@$(ACTIVATE) ; cd $(<D) ; bash $(<F)
 
 ## test      : run testing suite.
 .PHONY : test
@@ -35,15 +36,18 @@ test : env
 
 ## train      : train models from scratch.
 .PHONY : train
-train : 
-	@echo "Training loop commented out. Use setup recipe to download pretrained models."
-# train : env rnng rnnlm
-# rnng : corpora $(PACKAGE)/models/rnng_ptb.pt
-# rnnlm : corpora $(PACKAGE)/models/rnnlm_ptb.pt
-# corpora : $(PACKAGE)/data/ptb-train.pkl
-# $(PACKAGE)/models/rnng_ptb.pt : $(PACKAGE)/train.py
-# 	@$(ACTIVATE) ; cd train ; bash train_rnng.sh
-# $(PACKAGE)/models/rnnlm_ptb.pt : $(PACKAGE)/train_lm.py
-# 	@$(ACTIVATE) ; cd train ; bash train_rnnlm.sh
-# $(PACKAGE)/data/ptb-train.pkl : $(PACKAGE)/data/ptb_train.txt
-# 	@$(ACTIVATE) ; cd train ; bash prep_corpora.sh
+# train : 
+# 	@echo "Training loop commented out. Use setup recipe to download pretrained models."
+train : env rnnlm_ptb_k rnng_td_ptb_k rnng_td_ptb_n rnng_lc_ptb_n
+rnnlm_ptb_k : corpora_k models/rnnlm_ptb_k.pt
+rnng_td_ptb_k : corpora_k models/rnng_td_ptb_k.pt
+rnng_td_ptb_n : corpora_n models/rnng_td_ptb_n.pt
+rnng_lc_ptb_n : corpora_n models/rnng_lc_ptb_n.pt
+corpora_k : urnng/data/ptb-train.pkl
+corpora_n : rnng-pytorch/data/ptb-train.json
+models/%.pt : train/train.sh
+	@$(ACTIVATE) ; cd $(<D) ; bash $(<F) $(@F)
+urnng/data/ptb-train.pkl : train/corpora.sh corpora/ptb_train.txt
+	@$(ACTIVATE) ; cd $(<D) ; bash $(<F) $(@D)
+rnng-pytorch/data/ptb-train.json : train/corpora.sh corpora/ptb_train.txt
+	@$(ACTIVATE) ; cd $(<D) ; bash $(<F) $(@D)
