@@ -9,4 +9,4 @@ COPY ./ .
 RUN apt-get update
 RUN apt-get -y install make
 RUN make setup
-RUN echo "source activate urnng" >> ~/.bashrc
+RUN echo "source activate rnng" >> ~/.bashrc
