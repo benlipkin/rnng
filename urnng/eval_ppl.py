@@ -44,7 +44,10 @@ def main(args):
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
     data = Dataset(args.test_file)
-    checkpoint = torch.load(args.model_file)
+    if args.gpu != -1:
+        checkpoint = torch.load(args.model_file)
+    else:
+        checkpoint = torch.load(args.model_file, map_location=torch.device("cpu"))
     model = checkpoint["model"]
     print("model architecture")
     print(model)

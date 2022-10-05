@@ -127,7 +127,10 @@ def clean_number(w):
 
 def main(args):
     print("loading model from " + args.model_file)
-    checkpoint = torch.load(args.model_file)
+    if args.gpu != -1:
+        checkpoint = torch.load(args.model_file)
+    else:
+        checkpoint = torch.load(args.model_file, map_location=torch.device("cpu"))
     model = checkpoint["model"]
     word2idx = checkpoint["word2idx"]
     cuda.set_device(args.gpu) if args.gpu != -1 else None
