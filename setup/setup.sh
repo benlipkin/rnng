@@ -2,15 +2,26 @@
 
 set -e
 
-conda install -yc anaconda wget
+wget=$(conda list wget | grep -c wget)
+if [ "$wget" -eq 0 ]; then
+    conda install -yc anaconda wget
+fi
 
-HOME_DIR="${1:-$(dirname $(pwd))}"
-MODEL_DIR="$HOME_DIR/models"
-cd "$MODEL_DIR"
-
-for MODEL in {IN_PROGRESS}
-do
-    if [ ! -f "$MODEL" ]; then
-        wget -O "$MODEL" "https://huggingface.co/datasets/benlipkin/rnng-brainscore/resolve/main/$MODEL"
+f="$1"
+HOME_DIR="$(dirname $(pwd))"
+if [[ "$f" =~ data ]]; then
+    FNAME="$HOME_DIR/$(dirname $f)/data/ptb.vocab"
+    if [[ "$f" =~ urnng ]]; then
+        FILEID="ptb_k.vocab"
+    else
+        FILEID="ptb_n.vocab"
     fi
-done
+else
+    FNAME="$HOME_DIR/models/$f"
+    FILEID="$f"
+fi
+
+BASE="https://huggingface.co/datasets/benlipkin/rnng-brainscore/resolve/main"
+if [ ! -f "$FNAME" ]; then
+    wget -O "$FNAME" "$BASE/$FILEID"
+fi

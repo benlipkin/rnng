@@ -24,10 +24,16 @@ $(PACKAGE).egg-info/ : setup.py requirements.txt
 
 ## setup     : download large files and prepare runtime.
 .PHONY : setup
-	@$(ACTIVATE) ;
-# setup : env models/rnnlm_ptb_k.pt
-# models/rnnlm_ptb_k.pt : setup/setup.sh
-# 	@$(ACTIVATE) ; cd $(<D) ; bash $(<F)
+setup : env rnnlm_ptb_k rnng_td_ptb_n rnng_lc_ptb_n
+rnnlm_ptb_k : vocab_k models/rnnlm_ptb_k.pt
+rnng_td_ptb_n : vocab_n models/rnng_td_ptb_n.pt
+rnng_lc_ptb_n : vocab_n models/rnng_lc_ptb_n.pt
+vocab_k : urnng/data/ptb.vocab
+vocab_n : rnng-pytorch/data/ptb.vocab
+models/%.pt : setup/setup.sh
+	@$(ACTIVATE) ; cd $(<D) ; bash $(<F) $(@F)
+%/data/ptb.vocab : setup/setup.sh
+	@$(ACTIVATE) ; cd $(<D) ; bash $(<F) $(@D)
 
 ## test      : run testing suite.
 .PHONY : test
@@ -36,17 +42,16 @@ test : env
 
 ## train      : train models from scratch.
 .PHONY : train
-# train : 
-# 	@echo "Training loop commented out. Use setup recipe to download pretrained models."
-train : env rnnlm_ptb_k rnng_td_ptb_k rnng_td_ptb_n rnng_lc_ptb_n
-rnnlm_ptb_k : corpora_k models/rnnlm_ptb_k.pt
-rnng_td_ptb_k : corpora_k models/rnng_td_ptb_k.pt
-rnng_td_ptb_n : corpora_n models/rnng_td_ptb_n.pt
-rnng_lc_ptb_n : corpora_n models/rnng_lc_ptb_n.pt
-corpora_k : urnng/data/ptb-train.pkl
-corpora_n : rnng-pytorch/data/ptb-train.json
-models/%.pt : train/train.sh
-	@$(ACTIVATE) ; cd $(<D) ; bash $(<F) $(@F)
-corpora := $(wildcard */data/ptb-train.*)
-$(corpora) : train/corpora.sh corpora/ptb_train.txt
-	@$(ACTIVATE) ; cd $(<D) ; bash $(<F) $(@D)
+train : 
+	@echo "Training loop commented out. Use setup recipe to download pretrained models."
+# train : env rnnlm_ptb_k rnng_td_ptb_n rnng_lc_ptb_n
+# rnnlm_ptb_k : corpora_k models/rnnlm_ptb_k.pt
+# rnng_td_ptb_n : corpora_n models/rnng_td_ptb_n.pt
+# rnng_lc_ptb_n : corpora_n models/rnng_lc_ptb_n.pt
+# corpora_k : urnng/data/ptb-train.pkl
+# corpora_n : rnng-pytorch/data/ptb-train.json
+# models/%.pt : train/train.sh
+# 	@$(ACTIVATE) ; cd $(<D) ; bash $(<F) $(@F)
+# corpora := $(wildcard */data/ptb-train.*)
+# $(corpora) : train/corpora.sh corpora/ptb_train.txt
+# 	@$(ACTIVATE) ; cd $(<D) ; bash $(<F) $(@D)
