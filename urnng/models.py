@@ -46,6 +46,18 @@ class RNNLM(nn.Module):
                 break
         return x
 
+    def get_layer_rep(self, sent, rep):
+        word_vecs = self.dropout(self.word_vecs(sent))
+        if rep == "rnn.lm.emb.mean":
+            return word_vecs.mean(1)
+        h, _ = self.rnn(word_vecs)
+        if rep == "rnn.lm.lstm.mean":
+            return h.mean(1)
+        elif rep == "rnn.lm.lstm.last":
+            return h[:, -1, :]
+        else:
+            raise ValueError("Invalid rep argument")
+
 
 class SeqLSTM(nn.Module):
     def __init__(self, i_dim=200, h_dim=0, num_layers=1, dropout=0):

@@ -16,7 +16,9 @@ setup(
     author="Benjamin Lipkin",
     author_email="lipkinb@mit.edu",
     license="MIT",
-    packages=find_packages(where="urnng") + find_packages(where="rnng-pytorch"),
+    packages=find_packages(where="urnng")
+    + find_packages(where="rnng-pytorch")
+    + find_packages(where="brainscore"),
     install_requires=requirements,
     python_requires=">=3.6,<3.7",
 )
