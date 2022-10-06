@@ -25,15 +25,11 @@ $(PACKAGE).egg-info/ : setup.py requirements.txt
 ## setup     : download large files and prepare runtime.
 .PHONY : setup
 setup : env rnnlm_ptb_k rnng_td_ptb_n rnng_lc_ptb_n
-rnnlm_ptb_k : vocab_k models/rnnlm_ptb_k.pt
-rnng_td_ptb_n : vocab_n models/rnng_td_ptb_n.pt
-rnng_lc_ptb_n : vocab_n models/rnng_lc_ptb_n.pt
-vocab_k : urnng/data/ptb.vocab
-vocab_n : rnng-pytorch/data/ptb.vocab
+rnnlm_ptb_k : models/rnnlm_ptb_k.pt
+rnng_td_ptb_n : models/rnng_td_ptb_n.pt
+rnng_lc_ptb_n : models/rnng_lc_ptb_n.pt
 models/%.pt : setup/setup.sh
 	@$(ACTIVATE) ; cd $(<D) ; bash $(<F) $(@F)
-%/data/ptb.vocab : setup/setup.sh
-	@$(ACTIVATE) ; cd $(<D) ; bash $(<F) $(@D)
 
 ## test      : run testing suite.
 .PHONY : test
