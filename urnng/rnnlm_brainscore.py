@@ -11,7 +11,6 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument("--text_path", type=str, required=True)
 parser.add_argument("--model_path", type=str, required=True)
-parser.add_argument("--rep_path", type=str, required=True)
 parser.add_argument("--rep", type=str, required=True)
 parser.add_argument("--include_eos", default=False, type=bool)
 parser.add_argument("--gpu", default=-1, type=int, help="which gpu to use")
@@ -62,9 +61,7 @@ def main(args):
     model, word2idx = load_model(args)
     sent = prep_sent(load_sent(args), word2idx, args.include_eos)
     rep = get_rep(sent, model, args)
-    rep_json = json.dumps({args.rep: rep.tolist()})
-    with open(args.rep_path, "w") as f:
-        f.write(rep_json)
+    rep_json = json.dumps(rep.tolist())
     sys.stdout.write(rep_json)
 
 

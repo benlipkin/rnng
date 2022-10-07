@@ -47,10 +47,10 @@ class RNNLM(nn.Module):
         return x
 
     def get_layer_rep(self, sent, rep):
-        word_vecs = self.dropout(self.word_vecs(sent))
+        word_vecs = self.word_vecs(sent)
         if rep == "rnn.lm.emb.mean":
             return word_vecs.mean(1)
-        h, _ = self.rnn(word_vecs)
+        h, _ = self.rnn(self.dropout(word_vecs))
         if rep == "rnn.lm.lstm.mean":
             return h.mean(1)
         elif rep == "rnn.lm.lstm.last":

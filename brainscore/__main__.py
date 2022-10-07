@@ -47,29 +47,18 @@ def get_path_to_model(model):
     return path
 
 
-def get_rep_fname(text_path, rep):
-    rep_dir = pathlib.Path(__file__).parents[1] / "reps"
-    if not rep_dir.exists():
-        rep_dir.mkdir(parents=True, exist_ok=True)
-    path = rep_dir / f"{text_path.stem}_{rep}.json"
-    return path
-
-
-def get_rep_obj(text_path, model_path, rep_path, rep, gpu):
+def get_rep_json(text_path, model_path, rep, gpu):
     src_dir = "urnng" if "rnnlm" in model_path.stem else "rnng-pytorch"
     src_file = f"{model_path.stem.split('_')[0]}_brainscore"
     cmd = ["cd", str(src_dir), ";"]
     cmd += ["python", "-m", str(src_file)]
     cmd += ["--text_path", str(text_path)]
     cmd += ["--model_path", str(model_path)]
-    cmd += ["--rep_path", str(rep_path)]
     cmd += ["--rep", str(rep)]
     cmd += ["--gpu", str(gpu)]
     output = subprocess.check_output(" ".join(cmd), shell=True)
-    rep_obj = json.loads(output.decode("utf-8"))
-    assert len(rep_obj) == 1
-    assert list(rep_obj.keys())[0] == rep
-    return rep_obj
+    rep_json = output.decode("utf-8")
+    return rep_json
 
 
 def main(args):
@@ -80,9 +69,7 @@ def main(args):
     tokenized = tokenize(args.input)
     text_path = save_input_str_to_file(tokenized)
     model_path = get_path_to_model(args.model)
-    rep_path = get_rep_fname(text_path, args.rep)
-    rep_obj = get_rep_obj(text_path, model_path, rep_path, args.rep, args.gpu)
-    rep_json = json.dumps(rep_obj)
+    rep_json = get_rep_json(text_path, model_path, args.rep, args.gpu)
     sys.stdout.write(rep_json)
 
 
