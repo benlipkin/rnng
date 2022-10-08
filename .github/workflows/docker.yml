@@ -1,0 +1,25 @@
+name:                     Docker
+
+on:
+  push:
+    branches:             [main]
+
+jobs:
+  build_docker:
+
+    runs-on:              ubuntu-latest
+
+    steps:
+      - name:             checkout repo
+        uses:             actions/checkout@v3.0.0
+        with:
+          fetch-depth:    1
+
+      - name:             login to docker
+        run:              docker login -u ${{github.repository_owner}} -p ${{secrets.DOCKERHUB_TOKEN}}
+
+      - name:             build docker image
+        run:              docker build . --file Dockerfile --tag ${{github.repository}}:${{github.sha}}
+
+      - name:             push image to dockerhub
+        run:              docker push ${{github.repository}}:${{github.sha}}

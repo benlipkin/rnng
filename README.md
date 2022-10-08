@@ -1,3 +1,5 @@
+[![Build](https://github.com/benlipkin/rnng/actions/workflows/docker.yml/badge.svg)](https://github.com/benlipkin/rnng/actions/workflows/docker.yml)
+
 # BrainScore Wrapper for Recurrent Neural Network Grammars
 
 ## Summary
