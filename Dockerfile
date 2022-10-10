@@ -10,4 +10,4 @@ RUN apt-get update
 RUN apt-get -y install make
 RUN make setup
 
-ENTRYPOINT ["conda", "run", "-n", "rnng", "python", "-m", "brainscore"]
+ENTRYPOINT ["/bin/bash", "-c"]
