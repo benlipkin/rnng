@@ -46,8 +46,8 @@ class RNNLM(nn.Module):
                 break
         return x
 
-    def get_layer_rep(self, sent, rep):
-        word_vecs = self.word_vecs(sent)
+    def get_rep(self, tokens, rep):
+        word_vecs = self.word_vecs(tokens)
         if rep == "rnn.lm.emb.mean":
             return word_vecs.mean(1)
         h, _ = self.rnn(self.dropout(word_vecs))
