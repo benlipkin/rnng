@@ -2,6 +2,7 @@
 import argparse
 import json
 import sys
+from tkinter import E
 
 import numpy as np
 import torch
@@ -9,9 +10,10 @@ from torch import cuda
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--text", type=str, required=True)
 parser.add_argument("--model", type=str, required=True)
-parser.add_argument("--rep", type=str, required=True)
+parser.add_argument("--measure", type=str, required=True)
+parser.add_argument("--context", type=str, required=True)
+parser.add_argument("--text", type=str, required=True)
 parser.add_argument("--gpu", default=-1, type=int, help="which gpu to use")
 parser.add_argument("--seed", default=3435, type=int, help="random seed")
 parser.add_argument("--include_eos", default=False, type=bool)
@@ -21,10 +23,11 @@ def load_model(args):
     cuda.set_device(args.gpu) if args.gpu != -1 else None
     checkpoint = torch.load(args.model)
     word2idx = checkpoint["word2idx"]
+    idx2word = checkpoint["idx2word"]
     model = checkpoint["model"]
     model.eval()
     model.cuda() if args.gpu != -1 else None
-    return model, word2idx
+    return model, word2idx, idx2word
 
 
 def prep_tokens(text, word2idx, include_eos=False):
@@ -38,22 +41,32 @@ def prep_tokens(text, word2idx, include_eos=False):
     return tokens
 
 
-def get_rep(tokens, model, args):
+def get_measure(model, tokens, lastn, idx2word, args):
     tokens = tokens.cuda() if args.gpu != -1 else tokens
     with torch.no_grad():
-        rep = model.get_rep(tokens, args.rep)
-        assert rep.shape[0] == 1
-    return rep.cpu().numpy().squeeze()
+        measure = model.get_measure(tokens, args.measure, lastn)
+    if args.measure == "next-word":
+        measure = idx2word[measure]
+    else:
+        measure = measure.tolist()
+    if "token" in args.measure:
+        return {
+            "tokens": tokens.cpu().numpy().squeeze()[-lastn:].tolist(),
+            "measure": measure,
+        }
+    else:
+        return {"measure": measure}
 
 
 def main(args):
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
-    model, word2idx = load_model(args)
-    tokens = prep_tokens(args.text, word2idx, args.include_eos)
-    rep = get_rep(tokens, model, args)
-    rep_json = json.dumps(rep.tolist())
-    sys.stdout.write(rep_json)
+    model, word2idx, idx2word = load_model(args)
+    tokens = prep_tokens(args.context, word2idx, args.include_eos)
+    lastn = len(args.text.strip().split())
+    measure = get_measure(model, tokens, lastn, idx2word, args)
+    response_json = json.dumps(measure)
+    sys.stdout.write(response_json)
 
 
 if __name__ == "__main__":

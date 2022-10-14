@@ -7,15 +7,25 @@ import nltk
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--text", type=str, required=True, help="string to be evaluated.")
 parser.add_argument("--model", type=str, required=True, help="evaluation model.")
-parser.add_argument("--rep", type=str, required=True, help="representation to extract.")
+parser.add_argument("--measure", type=str, required=True, help="measure to extract.")
+parser.add_argument("--context", type=str, required=True, help="text context.")
+parser.add_argument("--text", type=str, required=True, help="string to be evaluated.")
 parser.add_argument("--gpu", default=-1, type=int, help="which gpu to use. -1 for cpu.")
 
-reps = {
-    "rnnlm_ptb_k": ["rnn.lm.emb.mean", "rnn.lm.lstm.mean", "rnn.lm.lstm.last"],
-    "rnng_td_ptb_n": [],
-    "rnng_lc_ptb_n": [],
+supported = {
+    "rnn-lm-ptb": {
+        "path": pathlib.Path(__file__).parents[1] / "models" / "rnnlm_ptb_k.pt",
+        "measures": ["next-word", "token-logits", "emb-mean", "lstm-mean", "lstm-last"],
+    },
+    "rnn-tdg-ptb": {
+        "path": pathlib.Path(__file__).parents[1] / "models" / "rnng_td_ptb_n.pt",
+        "measures": [],
+    },
+    "rnn-lcg-ptb": {
+        "path": pathlib.Path(__file__).parents[1] / "models" / "rnng_lc_ptb_n.pt",
+        "measures": [],
+    },
 }
 
 
@@ -26,20 +36,15 @@ def tokenize(text):
     return " ".join(tokens)
 
 
-def get_path_to_model(model):
-    model_dir = pathlib.Path(__file__).parents[1] / "models"
-    path = model_dir / f"{model}.pt"
-    return path
-
-
-def get_rep_json(text, model, rep, gpu):
-    src_dir = "urnng" if "rnnlm" in model.stem else "rnng-pytorch"
-    src_file = f"{model.stem.split('_')[0]}_brainscore"
-    cmd = ["cd", str(src_dir), ";"]
+def get_response_json(model, measure, context, text, gpu):
+    src_dir = "urnng" if "lm" in model.stem else "rnng-pytorch"
+    src_file = "rnnlm_brainscore" if "lm" in model.stem else "rnng_brainscore"
+    cmd = ["cd", str(src_dir), "&&"]
     cmd += ["python", "-m", str(src_file)]
-    cmd += ["--text", f'"{str(text)}"']
     cmd += ["--model", str(model)]
-    cmd += ["--rep", str(rep)]
+    cmd += ["--measure", str(measure)]
+    cmd += ["--context", f'"{str(context)}"']
+    cmd += ["--text", f'"{str(text)}"']
     cmd += ["--gpu", str(gpu)]
     output = subprocess.check_output(" ".join(cmd), shell=True)
     rep_json = output.decode("utf-8")
@@ -47,14 +52,19 @@ def get_rep_json(text, model, rep, gpu):
 
 
 def main(args):
-    if not args.model in reps.keys():
-        raise ValueError(f"model must be one of {reps.keys()}.")
-    if not args.rep in reps[args.model]:
-        raise ValueError(f"representation must be one of {reps[args.model]}.")
+    if not args.model in supported.keys():
+        raise ValueError(f"model must be one of {supported.keys()}.")
+    if not args.measure in supported[args.model]["measures"]:
+        raise ValueError(f"measure must be one of {supported[args.model]['measures']}.")
+    context = tokenize(args.context)
     text = tokenize(args.text)
-    model = get_path_to_model(args.model)
-    rep_json = get_rep_json(text, model, args.rep, args.gpu)
-    sys.stdout.write(rep_json)
+    if not context[-len(text) :] == text:
+        raise ValueError(
+            "context must end with text, e.g., context='I am a wug', text='a wug'"
+        )
+    model = supported[args.model]["path"]
+    response_json = get_response_json(model, args.measure, context, text, args.gpu)
+    sys.stdout.write(response_json)
 
 
 if __name__ == "__main__":

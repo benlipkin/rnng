@@ -46,15 +46,20 @@ class RNNLM(nn.Module):
                 break
         return x
 
-    def get_rep(self, tokens, rep):
+    def get_measure(self, tokens, measure, lastn):
         word_vecs = self.word_vecs(tokens)
-        if rep == "rnn.lm.emb.mean":
-            return word_vecs.mean(1)
+        if measure == "emb-mean":
+            return word_vecs[:, -lastn:, :].mean(1).cpu().numpy().squeeze()
         h, _ = self.rnn(self.dropout(word_vecs))
-        if rep == "rnn.lm.lstm.mean":
-            return h.mean(1)
-        elif rep == "rnn.lm.lstm.last":
-            return h[:, -1, :]
+        if measure == "lstm-mean":
+            return h[:, -lastn:, :].mean(1).cpu().numpy().squeeze()
+        if measure == "lstm-last":
+            return h[:, -1, :].cpu().numpy().squeeze()
+        logits = self.vocab_linear(self.dropout(h))
+        if measure == "token-logits":
+            return logits[:, -lastn:, :].cpu().numpy().squeeze()
+        if measure == "next-word":
+            return np.argmax(logits[:, -1, :].cpu().numpy().squeeze())
         else:
             raise ValueError("Invalid rep argument")
 
