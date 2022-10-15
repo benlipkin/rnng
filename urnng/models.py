@@ -57,7 +57,7 @@ class RNNLM(nn.Module):
             return h[:, -1, :].cpu().numpy().squeeze()
         logits = self.vocab_linear(self.dropout(h))
         if measure == "token-logits":
-            return logits[:, -lastn:, :].cpu().numpy().squeeze()
+            return logits[:, -lastn - 1 : -1, :].cpu().numpy().squeeze(0)
         if measure == "next-word":
             return np.argmax(logits[:, -1, :].cpu().numpy().squeeze())
         else:
