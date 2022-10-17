@@ -47,8 +47,8 @@ def get_response_json(model, measure, context, text, gpu):
     cmd += ["--text", f'"{str(text)}"']
     cmd += ["--gpu", str(gpu)]
     output = subprocess.check_output(" ".join(cmd), shell=True)
-    rep_json = output.decode("utf-8")
-    return rep_json
+    response_json = output.decode("utf-8")
+    return response_json
 
 
 def main(args):

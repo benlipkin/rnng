@@ -49,12 +49,12 @@ class RNNLM(nn.Module):
     def get_measure(self, tokens, measure, lastn):
         word_vecs = self.word_vecs(tokens)
         if measure == "emb-mean":
-            return word_vecs[:, -lastn:, :].mean(1).cpu().numpy().squeeze()
+            return word_vecs[:, -lastn:, :].mean(1).cpu().numpy()
         h, _ = self.rnn(self.dropout(word_vecs))
         if measure == "lstm-mean":
-            return h[:, -lastn:, :].mean(1).cpu().numpy().squeeze()
+            return h[:, -lastn:, :].mean(1).cpu().numpy()
         if measure == "lstm-last":
-            return h[:, -1, :].cpu().numpy().squeeze()
+            return h[:, -1, :].cpu().numpy()
         logits = self.vocab_linear(self.dropout(h))
         if measure == "token-logits":
             return logits[:, -lastn - 1 : -1, :].cpu().numpy().squeeze(0)
