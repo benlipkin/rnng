@@ -17,6 +17,7 @@ parser.add_argument("--text", type=str, required=True)
 parser.add_argument("--gpu", default=-1, type=int, help="which gpu to use")
 parser.add_argument("--seed", default=3435, type=int, help="random seed")
 parser.add_argument("--include_eos", default=False, type=bool)
+parser.add_argument("--sentence_only", action="store_true")
 
 
 def load_model(args):
@@ -62,7 +63,8 @@ def main(args):
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
     model, word2idx, idx2word = load_model(args)
-    tokens = prep_tokens(args.context, word2idx, args.include_eos)
+    text = args.text if args.sentence_only else args.context
+    tokens = prep_tokens(text, word2idx, args.include_eos)
     lastn = len(args.text.strip().split())
     measure = get_measure(model, tokens, lastn, idx2word, args)
     response_json = json.dumps(measure)

@@ -1689,3 +1689,21 @@ class FixedStackRNNG(nn.Module):
         end_action_mask = action_id == self.action_dict.finish_action()
         end_action_mask = end_action_mask * pre_final_mask
         return end_action_mask
+
+    ########################################
+    def get_reps(self, x, actions, subword_end_mask):
+        assert isinstance(x, torch.Tensor)
+        assert isinstance(actions, torch.Tensor)
+
+        stack_size = max(100, x.size(1) + 10)
+        stack = self.build_stack(x, stack_size)
+
+        word_vecs = self.emb(x)
+        action_contexts = self.unroll_states(
+            stack, word_vecs, actions, subword_end_mask
+        )
+
+        reps = {}
+        reps["emb-mean"] = word_vecs.mean(dim=1).detach().cpu().numpy().tolist()
+        reps["rnng-mean"] = action_contexts.mean(dim=1).detach().cpu().numpy().tolist()
+        return reps

@@ -16,15 +16,23 @@ parser.add_argument("--gpu", default=-1, type=int, help="which gpu to use. -1 fo
 supported = {
     "rnn-lm-ptb": {
         "path": pathlib.Path(__file__).parents[1] / "models" / "rnnlm_ptb_k.pt",
-        "measures": ["next-word", "token-logits", "emb-mean", "lstm-mean", "lstm-last"],
+        "measures": ["next-word", "token-logits", "emb-mean", "lstm-mean"],
+        "sentence_only": False,
+    },
+    "rnn-slm-ptb": {
+        "path": pathlib.Path(__file__).parents[1] / "models" / "rnnlm_ptb_k.pt",
+        "measures": ["emb-mean", "lstm-mean"],
+        "sentence_only": True,
     },
     "rnn-tdg-ptb": {
         "path": pathlib.Path(__file__).parents[1] / "models" / "rnng_td_ptb_n.pt",
-        "measures": [],
+        "measures": ["emb-mean", "rnng-mean"],
+        "sentence_only": True,
     },
     "rnn-lcg-ptb": {
         "path": pathlib.Path(__file__).parents[1] / "models" / "rnng_lc_ptb_n.pt",
-        "measures": [],
+        "measures": ["emb-mean", "rnng-mean"],
+        "sentence_only": True,
     },
 }
 
@@ -36,7 +44,7 @@ def tokenize(text):
     return " ".join(tokens)
 
 
-def get_response_json(model, measure, context, text, gpu):
+def get_response_json(model, measure, context, text, gpu, sentence_only):
     src_dir = "urnng" if "lm" in model.stem else "rnng-pytorch"
     src_file = "rnnlm_brainscore" if "lm" in model.stem else "rnng_brainscore"
     cmd = ["cd", str(src_dir), "&&"]
@@ -46,6 +54,7 @@ def get_response_json(model, measure, context, text, gpu):
     cmd += ["--context", f'"{str(context)}"']
     cmd += ["--text", f'"{str(text)}"']
     cmd += ["--gpu", str(gpu)]
+    cmd += ["--sentence_only"] if sentence_only else []
     output = subprocess.check_output(" ".join(cmd), shell=True)
     response_json = output.decode("utf-8")
     return response_json
@@ -63,7 +72,10 @@ def main(args):
             "context must end with text, e.g., context='I am a wug', text='a wug'"
         )
     model = supported[args.model]["path"]
-    response_json = get_response_json(model, args.measure, context, text, args.gpu)
+    sentence_only = supported[args.model]["sentence_only"]
+    response_json = get_response_json(
+        model, args.measure, context, text, args.gpu, sentence_only
+    )
     sys.stdout.write(response_json)
 
 
