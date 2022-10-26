@@ -30,10 +30,9 @@ logger = logging.getLogger(__name__)
 parser = argparse.ArgumentParser()
 
 # Data path options
-parser.add_argument("--test_file", default="data/ptb-test.raw.txt")
-parser.add_argument("--lm_output_file", default="surprisals.txt")
+parser.add_argument("--text", default="")
 parser.add_argument("--model_file", default="rnng.pt")
-parser.add_argument("--rep_file", default="reps.txt")
+parser.add_argument("--measure", default="")
 parser.add_argument("--beam_size", type=int, default=200)
 parser.add_argument("--word_beam_size", type=int, default=20)
 parser.add_argument("--shift_size", type=int, default=5)
@@ -121,8 +120,8 @@ def main(args):
         model.half()
 
     # todo: add tagger.
-    dataset = Dataset.from_text_file(
-        args.test_file,
+    dataset = Dataset.from_text(
+        args.text,
         args.batch_size,
         vocab,
         action_dict,
@@ -281,68 +280,68 @@ def main(args):
             ############################
             actions = torch.Tensor(best_actions).to(torch.int64).to(device)
             reps = model.get_reps(tokens, actions, subword_end_mask)
-            reps_json = json.dumps(reps)
-            with open(args.rep_file, "w") as f:
-                f.write(reps_json)
+            response = {"measure": reps[args.measure]}
+            response_json = json.dumps(response)
+            sys.stdout.write(response_json)
             ############################
 
-            subword_end_mask = subword_end_mask.cpu().numpy()
-            trees = [
-                action_dict.build_tree_str(
-                    best_actions[i],
-                    dataset.sents[batch_idx[i]].orig_tokens,
-                    dataset.sents[batch_idx[i]].tags,
-                    subword_end_mask[i],
-                )
-                for i in range(len(batch_idx))
-            ]
-            block_idxs.extend(batch_idx)
-            block_parses.extend(trees)
-            block_surprisals.extend(surprisals)
-            cur_block_size += tokens.size(0)
+    #         subword_end_mask = subword_end_mask.cpu().numpy()
+    #         trees = [
+    #             action_dict.build_tree_str(
+    #                 best_actions[i],
+    #                 dataset.sents[batch_idx[i]].orig_tokens,
+    #                 dataset.sents[batch_idx[i]].tags,
+    #                 subword_end_mask[i],
+    #             )
+    #             for i in range(len(batch_idx))
+    #         ]
+    #         block_idxs.extend(batch_idx)
+    #         block_parses.extend(trees)
+    #         block_surprisals.extend(surprisals)
+    #         cur_block_size += tokens.size(0)
 
-            if cur_block_size >= args.block_size:
-                assert cur_block_size == args.block_size
-                sort_and_print_trees(block_idxs, block_parses, block_surprisals)
-                block_idxs = []
-                block_parses = []
-                block_surprisals = []
-                cur_block_size = 0
+    #         if cur_block_size >= args.block_size:
+    #             assert cur_block_size == args.block_size
+    #             sort_and_print_trees(block_idxs, block_parses, block_surprisals)
+    #             block_idxs = []
+    #             block_parses = []
+    #             block_surprisals = []
+    #             cur_block_size = 0
 
-    sort_and_print_trees(block_idxs, block_parses, block_surprisals)
-    end_time = time.time()
+    # sort_and_print_trees(block_idxs, block_parses, block_surprisals)
+    # end_time = time.time()
 
-    with open(args.lm_output_file, "wt") as o:
-        all_word_surps = []
-        for sent_i, (sent, surp) in enumerate(zip(dataset.sents, all_surprisals)):
-            orig_tokens = sent.orig_tokens
-            input_tokens = [vocab.id_to_word(t_id) for t_id in sent.token_ids]
-            subword_spans = sent.get_subword_span_index()
-            piece_surp = [[surp[j] for j in span] for span in subword_spans]
-            word_surp = [sum(s) for s in piece_surp]
-            all_word_surps.append(word_surp)
-            pieces = [[input_tokens[j] for j in span] for span in subword_spans]
-            assert len(orig_tokens) == len(word_surp)
-            for t_i in range(len(orig_tokens)):
-                orig_t = orig_tokens[t_i]
-                mod_t = " ".join(pieces[t_i])
-                s = word_surp[t_i]
-                ps = " ".join([str(x) for x in piece_surp[t_i]])
-                o.write(
-                    "{}\t{}\t{}\t{}\t{}\t{}\n".format(sent_i, t_i, orig_t, mod_t, s, ps)
-                )
-        o.write("-----------------------------------\n")
+    # with open(args.lm_output_file, "wt") as o:
+    #     all_word_surps = []
+    #     for sent_i, (sent, surp) in enumerate(zip(dataset.sents, all_surprisals)):
+    #         orig_tokens = sent.orig_tokens
+    #         input_tokens = [vocab.id_to_word(t_id) for t_id in sent.token_ids]
+    #         subword_spans = sent.get_subword_span_index()
+    #         piece_surp = [[surp[j] for j in span] for span in subword_spans]
+    #         word_surp = [sum(s) for s in piece_surp]
+    #         all_word_surps.append(word_surp)
+    #         pieces = [[input_tokens[j] for j in span] for span in subword_spans]
+    #         assert len(orig_tokens) == len(word_surp)
+    #         for t_i in range(len(orig_tokens)):
+    #             orig_t = orig_tokens[t_i]
+    #             mod_t = " ".join(pieces[t_i])
+    #             s = word_surp[t_i]
+    #             ps = " ".join([str(x) for x in piece_surp[t_i]])
+    #             o.write(
+    #                 "{}\t{}\t{}\t{}\t{}\t{}\n".format(sent_i, t_i, orig_t, mod_t, s, ps)
+    #             )
+    #     o.write("-----------------------------------\n")
 
-        ll = -sum([sum(surp) for surp in all_word_surps])
-        num_words = sum([len(surp) for surp in all_word_surps])
-        ppl = np.exp(-ll / num_words)
-        o.write(
-            "perplexity: {} Time: {} Throughput: {}".format(
-                ppl,
-                end_time - start_time,
-                (len(dataset.sents)) / (end_time - start_time),
-            )
-        )
+    #     ll = -sum([sum(surp) for surp in all_word_surps])
+    #     num_words = sum([len(surp) for surp in all_word_surps])
+    #     ppl = np.exp(-ll / num_words)
+    #     o.write(
+    #         "perplexity: {} Time: {} Throughput: {}".format(
+    #             ppl,
+    #             end_time - start_time,
+    #             (len(dataset.sents)) / (end_time - start_time),
+    #         )
+    #     )
 
 
 if __name__ == "__main__":
