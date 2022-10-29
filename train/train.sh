@@ -24,11 +24,15 @@ if [[ "$MODEL" =~ _k.pt ]]; then
     cd "$BASE_DIR/urnng"
     if [[ "$MODEL" == "rnnlm_ptb_k.pt" ]]; then
         python train_lm.py \
+        --w_dim 512 \
+        --h_dim 512 \
         --train_file data/ptb-train.pkl \
         --val_file data/ptb-val.pkl \
         --save_path "$MODEL_DIR/$MODEL"
     elif [[ "$MODEL" == "rnng_td_ptb_k.pt" ]]; then
         python train.py \
+        --w_dim 512 \
+        --h_dim 512 \
         --train_file data/ptb-train.pkl \
         --val_file data/ptb-val.pkl \
         --save_path "$MODEL_DIR/$MODEL" \
@@ -40,17 +44,23 @@ elif [[ "$MODEL" =~ _n.pt ]]; then
     cd "$BASE_DIR/rnng-pytorch"
     if [[ "$MODEL" == "rnng_td_ptb_n.pt" ]]; then
         python train.py \
+        --w_dim 512 \
+        --h_dim 512 \
         --train_file data/ptb-train.json \
         --val_file data/ptb-val.json \
         --save_path "$MODEL_DIR/$MODEL" \
+        --batch_size 128 \
         --fixed_stack \
         --strategy top_down \
         --optimizer adam
     elif [[ "$MODEL" == "rnng_lc_ptb_n.pt" ]]; then
         python train.py \
+        --w_dim 512 \
+        --h_dim 512 \
         --train_file data/ptb-train.json \
         --val_file data/ptb-val.json \
         --save_path "$MODEL_DIR/$MODEL" \
+        --batch_size 128 \
         --fixed_stack \
         --strategy in_order \
         --optimizer adam

@@ -48,6 +48,7 @@ train :
 # corpora_n : rnng-pytorch/data/ptb-train.json
 # models/%.pt : train/train.sh
 # 	@$(ACTIVATE) ; cd $(<D) ; bash $(<F) $(@F)
-# corpora := $(wildcard */data/ptb-train.*)
-# $(corpora) : train/corpora.sh corpora/ptb_train.txt
+# urnng/data/ptb-train.pkl : train/corpora.sh corpora/ptb_train.txt
+# 	@$(ACTIVATE) ; cd $(<D) ; bash $(<F) $(@D)
+# rnng-pytorch/data/ptb-train.json : train/corpora.sh corpora/ptb_train.txt
 # 	@$(ACTIVATE) ; cd $(<D) ; bash $(<F) $(@D)
