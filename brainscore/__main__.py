@@ -14,23 +14,23 @@ parser.add_argument("--text", type=str, required=True, help="string to be evalua
 parser.add_argument("--gpu", default=-1, type=int, help="which gpu to use. -1 for cpu.")
 
 supported = {
-    "rnn-lm-ptb": {
-        "path": pathlib.Path(__file__).parents[1] / "models" / "rnnlm_ptb_k.pt",
+    "rnn-lm-ptboanc": {
+        "path": pathlib.Path(__file__).parents[1] / "models" / "rnnlm_ptboanc_k.pt",
         "measures": ["next-word", "token-logits", "emb-mean", "lstm-mean"],
         "sentence_only": False,
     },
-    "rnn-slm-ptb": {
-        "path": pathlib.Path(__file__).parents[1] / "models" / "rnnlm_ptb_k.pt",
+    "rnn-slm-ptboanc": {
+        "path": pathlib.Path(__file__).parents[1] / "models" / "rnnlm_ptboanc_k.pt",
         "measures": ["emb-mean", "lstm-mean"],
         "sentence_only": True,
     },
-    "rnn-tdg-ptb": {
-        "path": pathlib.Path(__file__).parents[1] / "models" / "rnng_td_ptb_n.pt",
+    "rnn-tdg-ptboanc": {
+        "path": pathlib.Path(__file__).parents[1] / "models" / "rnng_td_ptboanc_n.pt",
         "measures": ["emb-mean", "rnng-mean"],
         "sentence_only": True,
     },
-    "rnn-lcg-ptb": {
-        "path": pathlib.Path(__file__).parents[1] / "models" / "rnng_lc_ptb_n.pt",
+    "rnn-lcg-ptboanc": {
+        "path": pathlib.Path(__file__).parents[1] / "models" / "rnng_lc_ptboanc_n.pt",
         "measures": ["emb-mean", "rnng-mean"],
         "sentence_only": True,
     },
