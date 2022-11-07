@@ -24,10 +24,9 @@ $(PACKAGE).egg-info/ : setup.py requirements.txt
 
 ## setup     : download large files and prepare runtime.
 .PHONY : setup
-setup : env rnnlm_ptboanc_k rnng_td_ptboanc_n rnng_lc_ptboanc_n
+setup : env rnnlm_ptboanc_k rnng_td_ptboanc_n
 rnnlm_ptboanc_k : models/rnnlm_ptboanc_k.pt
 rnng_td_ptboanc_n : models/rnng_td_ptboanc_n.pt
-rnng_lc_ptboanc_n : models/rnng_lc_ptboanc_n.pt
 models/%.pt : setup/setup.sh
 	@$(ACTIVATE) ; cd $(<D) ; bash $(<F) $(@F)
 
@@ -40,10 +39,9 @@ test : env
 .PHONY : train
 train : 
 	@echo "Training loop commented out. Use setup recipe to download pretrained models."
-# train : env rnnlm_ptboanc_k rnng_td_ptboanc_n rnng_lc_ptboanc_n
+# train : env rnnlm_ptboanc_k rnng_td_ptboanc_n
 # rnnlm_ptboanc_k : corpora_k models/rnnlm_ptboanc_k.pt
 # rnng_td_ptboanc_n : corpora_n models/rnng_td_ptboanc_n.pt
-# rnng_lc_ptboanc_n : corpora_n models/rnng_lc_ptboanc_n.pt
 # corpora_k : urnng/data/ptboanc-train.pkl
 # corpora_n : rnng-pytorch/data/ptboanc-train.json
 # models/%.pt : train/train.sh

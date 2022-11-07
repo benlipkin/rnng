@@ -486,12 +486,9 @@ def main(args):
             global_batch_i += 1
             # optimizer.zero_grad()
 
-            try:
-                batch_ll = try_batch_step(
-                    token_ids, action_ids, max_stack_size, subword_end_mask
-                )
-            except Exception as e:  # memory error
-                logger.warning(f"Error at batch {b}: {e}")
+            batch_ll = try_batch_step(
+                token_ids, action_ids, max_stack_size, subword_end_mask
+            )
             total_a_ll += batch_ll[0]
             total_w_ll += batch_ll[1]
 
