@@ -22,19 +22,19 @@ unk_model () {
 
 if [[ "$MODEL" =~ _k.pt ]]; then
     cd "$BASE_DIR/urnng"
-    if [[ "$MODEL" == "rnnlm_ptb_k.pt" ]]; then
+    if [[ "$MODEL" == "rnnlm_ptboanc_k.pt" ]]; then
         python train_lm.py \
         --w_dim 512 \
         --h_dim 512 \
-        --train_file data/ptb-train.pkl \
-        --val_file data/ptb-val.pkl \
+        --train_file data/ptboanc-train.pkl \
+        --val_file data/ptboanc-val.pkl \
         --save_path "$MODEL_DIR/$MODEL"
-    elif [[ "$MODEL" == "rnng_td_ptb_k.pt" ]]; then
+    elif [[ "$MODEL" == "rnng_td_ptboanc_k.pt" ]]; then
         python train.py \
         --w_dim 512 \
         --h_dim 512 \
-        --train_file data/ptb-train.pkl \
-        --val_file data/ptb-val.pkl \
+        --train_file data/ptboanc-train.pkl \
+        --val_file data/ptboanc-val.pkl \
         --save_path "$MODEL_DIR/$MODEL" \
         --mode supervised
     else
@@ -42,23 +42,23 @@ if [[ "$MODEL" =~ _k.pt ]]; then
     fi
 elif [[ "$MODEL" =~ _n.pt ]]; then
     cd "$BASE_DIR/rnng-pytorch"
-    if [[ "$MODEL" == "rnng_td_ptb_n.pt" ]]; then
+    if [[ "$MODEL" == "rnng_td_ptboanc_n.pt" ]]; then
         python train.py \
         --w_dim 512 \
         --h_dim 512 \
-        --train_file data/ptb-train.json \
-        --val_file data/ptb-val.json \
+        --train_file data/ptboanc-train.json \
+        --val_file data/ptboanc-val.json \
         --save_path "$MODEL_DIR/$MODEL" \
         --batch_size 128 \
         --fixed_stack \
         --strategy top_down \
         --optimizer adam
-    elif [[ "$MODEL" == "rnng_lc_ptb_n.pt" ]]; then
+    elif [[ "$MODEL" == "rnng_lc_ptboanc_n.pt" ]]; then
         python train.py \
         --w_dim 512 \
         --h_dim 512 \
-        --train_file data/ptb-train.json \
-        --val_file data/ptb-val.json \
+        --train_file data/ptboanc-train.json \
+        --val_file data/ptboanc-val.json \
         --save_path "$MODEL_DIR/$MODEL" \
         --batch_size 128 \
         --fixed_stack \
