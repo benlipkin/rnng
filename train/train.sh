@@ -24,15 +24,15 @@ if [[ "$MODEL" =~ _k.pt ]]; then
     cd "$BASE_DIR/urnng"
     if [[ "$MODEL" == "rnnlm_ptboanc_k.pt" ]]; then
         python train_lm.py \
-        --w_dim 512 \
-        --h_dim 512 \
+        --w_dim 1024 \
+        --h_dim 1024 \
         --train_file data/ptboanc-train.pkl \
         --val_file data/ptboanc-val.pkl \
         --save_path "$MODEL_DIR/$MODEL"
     elif [[ "$MODEL" == "rnng_td_ptboanc_k.pt" ]]; then
         python train.py \
-        --w_dim 512 \
-        --h_dim 512 \
+        --w_dim 1024 \
+        --h_dim 1024 \
         --train_file data/ptboanc-train.pkl \
         --val_file data/ptboanc-val.pkl \
         --save_path "$MODEL_DIR/$MODEL" \
@@ -44,8 +44,8 @@ elif [[ "$MODEL" =~ _n.pt ]]; then
     cd "$BASE_DIR/rnng-pytorch"
     if [[ "$MODEL" == "rnng_td_ptboanc_n.pt" ]]; then
         python train.py \
-        --w_dim 512 \
-        --h_dim 512 \
+        --w_dim 1024 \
+        --h_dim 1024 \
         --train_file data/ptboanc-train.json \
         --val_file data/ptboanc-val.json \
         --save_path "$MODEL_DIR/$MODEL" \
@@ -55,8 +55,8 @@ elif [[ "$MODEL" =~ _n.pt ]]; then
         --optimizer adam
     elif [[ "$MODEL" == "rnng_lc_ptboanc_n.pt" ]]; then
         python train.py \
-        --w_dim 512 \
-        --h_dim 512 \
+        --w_dim 1024 \
+        --h_dim 1024 \
         --train_file data/ptboanc-train.json \
         --val_file data/ptboanc-val.json \
         --save_path "$MODEL_DIR/$MODEL" \
