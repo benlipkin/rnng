@@ -24,9 +24,9 @@ $(PACKAGE).egg-info/ : setup.py requirements.txt
 
 ## setup     : download large files and prepare runtime.
 .PHONY : setup
-setup : env rnnlm_ptboanc_k rnng_td_ptboanc_n
-rnnlm_ptboanc_k : models/rnnlm_ptboanc_k.pt
-rnng_td_ptboanc_n : models/rnng_td_ptboanc_n.pt
+setup : env rnnlm_ptboanc_k_1024 rnng_td_ptboanc_n_1024
+rnnlm_ptboanc_k_1024 : models/rnnlm_ptboanc_k_1024.pt
+rnng_td_ptboanc_n_1024 : models/rnng_td_ptboanc_n_1024.pt
 models/%.pt : setup/setup.sh
 	@$(ACTIVATE) ; cd $(<D) ; bash $(<F) $(@F)
 
